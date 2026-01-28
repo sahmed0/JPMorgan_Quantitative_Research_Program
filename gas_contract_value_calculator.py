@@ -4,104 +4,161 @@ Created on Tue Dec  5 23:09:52 2023
 
 @author: ahmed
 
-Calculates value of natural gas contracts for trading
+Calculates the value of natural gas contracts for trading, accounting for
+seasonal fluctuations and physical storage constraints.
 """
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from datetime import date, timedelta, datetime
+from datetime import datetime, timedelta
+from sklearn.linear_model import LinearRegression
 
-# Load and process data
+# --- 1. Data Processing & Visualisation ---
+# Load data
 data = pd.read_csv("Nat_Gas.csv")
 data['Dates'] = pd.to_datetime(data['Dates'], format='%m/%d/%y')
-prices = data['Prices'].values
-dates = data['Dates'].values
 
-# Plotting
-plt.plot(dates, prices, '-')
+# Use the very first date in data as the anchor (Day 0) to avoid hardcoding "2020-10-31"
+start_date = data['Dates'].min()
+data['Days_From_Start'] = (data['Dates'] - start_date).dt.days
+
+# Plot initial data
+plt.figure(figsize=(10, 6))
+plt.plot(data['Dates'], data['Prices'], '-', label='Historical Prices')
 plt.xlabel('Date')
 plt.ylabel('Price')
-plt.title('Natural Gas Prices')
-plt.xticks(rotation=45)
-plt.show()
-
-# Calculate time in days from the start date
-start_date = datetime(2020, 10, 31)
-days_from_start = (data['Dates'] - pd.Timestamp(start_date)).dt.days
-
-# Simple regression for the trend line
-def simple_regression(x, y):
-    xbar, ybar = np.mean(x), np.mean(y)
-    slope = np.sum((x - xbar) * (y - ybar)) / np.sum((x - xbar) ** 2)
-    intercept = ybar - slope * xbar
-    return slope, intercept
-
-slope, intercept = simple_regression(days_from_start, prices)
-
-# Plot trend
-plt.plot(days_from_start, prices, label='Prices')
-plt.plot(days_from_start, days_from_start * slope + intercept, label='Linear Trend')
-plt.xlabel('Days from start date')
-plt.ylabel('Price')
-plt.title('Linear Trend of Monthly Input Prices')
+plt.title('Natural Gas Prices (Historical)')
 plt.legend()
 plt.show()
 
-# Seasonal (annual) variation modeling
-seasonal_residuals = prices - (days_from_start * slope + intercept)
-sin_time = np.sin(2 * np.pi * days_from_start / 365)
-cos_time = np.cos(2 * np.pi * days_from_start / 365)
+# --- 2. Model ---
+# Fit Trend + Sin + Cos all at once.
+# This prevents the seasonal cycle from skewing the linear trend line.
 
-def bilinear_regression(y, x1, x2):
-    slope1 = np.sum(y * x1) / np.sum(x1 ** 2)
-    slope2 = np.sum(y * x2) / np.sum(x2 ** 2)
-    return slope1, slope2
+# Feature Engineering
+# Time variable for trend
+X_days = data['Days_From_Start'].values.reshape(-1, 1)
 
-slope1, slope2 = bilinear_regression(seasonal_residuals, sin_time, cos_time)
-amplitude = np.sqrt(slope1 ** 2 + slope2 ** 2)
-shift = np.arctan2(slope2, slope1)
+# Seasonal variables (Annual cycle = 365.25 days)
+X_sin = np.sin(2 * np.pi * data['Days_From_Start'] / 365.25).values.reshape(-1, 1)
+X_cos = np.cos(2 * np.pi * data['Days_From_Start'] / 365.25).values.reshape(-1, 1)
 
-# Full price prediction using trend + seasonal component
-def predict_price(days):
-    return amplitude * np.sin(2 * np.pi * days / 365 + shift) + days * slope + intercept
+# Combine into a single matrix for regression
+X_final = np.hstack((X_days, X_sin, X_cos))
+y = data['Prices'].values
 
-# Continuous prediction for interpolation and plot
-continuous_dates = pd.date_range(start=start_date, end='2024-09-30', freq='D')
-predicted_prices = [predict_price((d - pd.Timestamp(start_date)).days) for d in continuous_dates]
+# Fit Model
+model = LinearRegression()
+model.fit(X_final, y)
 
-# Plot predictions
-plt.plot(continuous_dates, predicted_prices, label='Predicted Prices')
-plt.plot(dates, prices, 'o', label='Observed Prices')
+print(f"Model Intercept: {model.intercept_:.4f}")
+print(f"Model Coefficients: Trend={model.coef_[0]:.5f}, Sin={model.coef_[1]:.4f}, Cos={model.coef_[2]:.4f}")
+
+# --- 3. Price Prediction Function ---
+
+def predict_price(target_date):
+    if isinstance(target_date, str):
+        target_date = pd.to_datetime(target_date)
+        
+    days = (target_date - start_date).days
+    
+    # Recreate the features for the new date
+    feat_sin = np.sin(2 * np.pi * days / 365.25)
+    feat_cos = np.cos(2 * np.pi * days / 365.25)
+    
+    # Predict
+    # Note: model.predict expects a 2D array, so we wrap the features in [[]]
+    pred_price = model.predict([[days, feat_sin, feat_cos]])[0]
+    return pred_price
+
+# Visualize predictions into the future
+future_dates = pd.date_range(start=start_date, end='2025-12-31', freq='D')
+future_days = (future_dates - start_date).days
+
+# Vectorised prediction for plotting (faster than a loop)
+fut_sin = np.sin(2 * np.pi * future_days / 365.25)
+fut_cos = np.cos(2 * np.pi * future_days / 365.25)
+X_future = np.column_stack((future_days, fut_sin, fut_cos))
+predicted_curve = model.predict(X_future)
+
+plt.figure(figsize=(10, 6))
+plt.plot(data['Dates'], y, 'o', label='Observed Data')
+plt.plot(future_dates, predicted_curve, '-', label='Model Prediction')
 plt.xlabel('Date')
 plt.ylabel('Price')
-plt.title('Predicted Natural Gas Prices')
+plt.title('Natural Gas Price Forecast (Trend + Seasonality)')
 plt.legend()
 plt.show()
 
-# Contract value calculation
-def calculate_contract_value(injection_dates, withdrawal_dates, purchase_prices, sale_prices,
-                             injection_rate, withdrawal_rate, max_storage_volume, storage_cost_per_day):
-    contract_value = 0
-    for inj_date, with_date, purchase_price, sale_price in zip(injection_dates, withdrawal_dates, purchase_prices, sale_prices):
+# --- 4. Contract Valuation Logic ---
+
+def calculate_contract_value(injection_dates, withdrawal_dates, 
+                             injection_rate, withdrawal_rate, 
+                             max_storage_volume, storage_cost_per_day,
+                             fixed_trade_volume=None):
+    """
+    Calculates the value of a storage contract.
+    - Uses the model to predict prices on the transaction dates.
+    - Limits trade volume based on injection_rate constraints.
+    """
+    
+    total_value = 0
+    
+    # Zip allows me to iterate through pairs of injection/withdrawal dates
+    for inj_date, with_date in zip(injection_dates, withdrawal_dates):
+        
+        # 1. Get predicted prices for these dates
+        buy_price = predict_price(inj_date)
+        sell_price = predict_price(with_date)
+        
+        # 2. Determine Volume
+        # We cannot inject more than the rate allows in a single day.
+        # If we assume these are single-day trades, volume is capped by rate.
+        max_possible_injection = injection_rate
+        max_possible_withdrawal = withdrawal_rate
+        
+        # If a fixed volume isn't specified, we trade the maximum possible for a single day
+        # (capped by storage size and rate limits)
+        if fixed_trade_volume:
+            volume = min(fixed_trade_volume, max_storage_volume)
+        else:
+            volume = min(max_storage_volume, max_possible_injection, max_possible_withdrawal)
+            
+        # 3. Calculate Time held
         storage_days = (with_date - inj_date).days
-        storage_cost = storage_cost_per_day * storage_days * max_storage_volume
-        stored_gas_value = (sale_price - purchase_price) * max_storage_volume
-        contract_value += stored_gas_value - storage_cost
-    return contract_value
+        if storage_days <= 0:
+            print(f"Warning: Withdrawal date {with_date.date()} is before injection date {inj_date.date()}. Skipping.")
+            continue
+            
+        # 4. Calculate Costs and Revenue
+        revenue = (sell_price - buy_price) * volume
+        cost = storage_cost_per_day * volume * storage_days
+        
+        profit = revenue - cost
+        total_value += profit
+        
+        print(f"Trade: Inj {inj_date.date()} @ ${buy_price:.2f} -> With {with_date.date()} @ ${sell_price:.2f}")
+        print(f"       Volume: {volume} units | Duration: {storage_days} days | Profit: ${profit:,.2f}")
 
-# Example usage
-injection_dates = [datetime(2023, 1, 15), datetime(2023, 5, 1), datetime(2023, 8, 15)]
-withdrawal_dates = [datetime(2023, 4, 15), datetime(2023, 7, 1), datetime(2023, 12, 31)]
-purchase_prices = [2.0, 2.5, 2.2]
-sale_prices = [3.0, 3.2, 3.5]
-injection_rate = 50000
+    return total_value
+
+# --- Example Usage ---
+
+injection_dates = [pd.Timestamp('2023-06-15'), pd.Timestamp('2023-08-15')]
+withdrawal_dates = [pd.Timestamp('2023-12-15'), pd.Timestamp('2024-02-15')]
+
+# Rates define how fast we can move gas. 
+# We cannot move 1,000,000 units in one day if the rate is 50,000.
+injection_rate = 50000 
 withdrawal_rate = 70000
 max_storage_volume = 1000000
-storage_cost_per_day = 0.1
+storage_cost_per_day = 0.01 # Lowered slightly for a realistic example
 
-value = calculate_contract_value(
-    injection_dates, withdrawal_dates, purchase_prices, sale_prices,
-    injection_rate, withdrawal_rate, max_storage_volume, storage_cost_per_day
+contract_val = calculate_contract_value(
+    injection_dates, withdrawal_dates,
+    injection_rate, withdrawal_rate,
+    max_storage_volume, storage_cost_per_day
 )
-print(f"Contract Value: ${value:.2f}")
+
+print(f"\nTotal Contract Value: ${contract_val:,.2f}")
