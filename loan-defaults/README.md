@@ -17,8 +17,7 @@ This module builds a pipeline to predict default probabilities based on borrower
 * **Stratified Validation:** Uses `StratifiedKFold` to ensure that rare default cases are evenly distributed across training and test sets.
 * **Financial Context:** Goes beyond accuracy by calculating **Expected Loss (EL)**:
 
-
-
+### *EL = PD x LGD x EAD*
 *(Probability of Default × Loss Given Default × Exposure at Default)*
 
 ### Usage
@@ -26,7 +25,7 @@ This module builds a pipeline to predict default probabilities based on borrower
 ```python
 from loan_predictor import LoanDefaultPredictor
 
-# Initialize and train the model
+# Initialise and train the model
 predictor = LoanDefaultPredictor('Loan_Data.csv')
 predictor.train()
 
@@ -66,7 +65,7 @@ It uses **Maximum Likelihood Estimation (MLE)** to find the optimal cut-off poin
 
 
 
-*Where  is defaults in the bucket,  is total loans, and  is the probability.*
+*Where k is defaults in the bucket, n is total loans, and p is the probability.*
 
 ### Usage
 
