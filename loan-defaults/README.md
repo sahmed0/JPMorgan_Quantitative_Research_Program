@@ -7,7 +7,7 @@ This repository contains two distinct approaches to estimating loan default risk
 
 ---
 
-## Project 1: Logistic Regression Model (`LoanDefaultPredictor`)
+## Project 1: Logistic Regression Model (`loan_default_calculation.py`)
 
 This module builds a pipeline to predict default probabilities based on borrower financial data. It addresses common issues in financial modelling, such as class imbalance (defaults are rare) and feature scaling.
 
@@ -63,7 +63,7 @@ We implemented a `check_feature_importance()` method to reverse-engineer these r
 
 ---
 
-## Project 2: Maximum Likelihood Estimation (`DefaultLikelihoodOptimizer`)
+## Project 2: Maximum Likelihood Estimation (`loan_log_likelihood_maximisation.py`)
 
 This script solves a segmentation problem: *How should we group FICO scores (300-850) to best differentiate between low-risk and high-risk borrowers?*
 
