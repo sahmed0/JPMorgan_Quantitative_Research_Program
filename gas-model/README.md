@@ -9,6 +9,10 @@ The core objective is to allow traders to:
 1. **Forecast Prices:** Predict the price of natural gas for any specific date in the future.
 2. **Value Contracts:** Calculate the profitability of a storage contract, accounting for buying (injection), storing, and selling (withdrawal) strategies.
 
+## Results
+![price plot](price-plot.png)
+![seasonal](seasonal-plot.png)
+
 ## Methodology
 
 ### 1. The Pricing Model (Trend + Seasonality)
@@ -17,10 +21,10 @@ Standard linear regression often fails with commodities because it ignores cycle
 
 **The Equation:**
 
-
-* : Time (days since start).
-* : The long-term price trend (inflation/market shift).
-* : The annual seasonal oscillation (winter vs. summer).
+![equation](pricing-equation.png)
+* t: Time (days since start).
+* β: The long-term price trend (inflation/market shift).
+* sin/cos: The annual seasonal oscillation (winter vs. summer).
 
 ### 2. Contract Valuation Logic
 
@@ -49,7 +53,7 @@ The valuation engine calculates the net profit of a storage contract. Unlike sim
 import pandas as pd
 from gas_price_predictor import PricePredictor, calculate_contract_value
 
-# 1. Initialize and Train
+# 1. Initialise and Train
 # Ensure 'Nat_Gas.csv' is in your working directory
 predictor = PricePredictor('Nat_Gas.csv')
 
