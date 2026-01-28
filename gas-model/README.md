@@ -10,8 +10,23 @@ The core objective is to allow traders to:
 2. **Value Contracts:** Calculate the profitability of a storage contract, accounting for buying (injection), storing, and selling (withdrawal) strategies.
 
 ## Results
-![price plot](price-plot.png)
-![seasonal](seasonal-plot.png)
+```text
+Trade: Inject 2024-06-15 @ $11.66 -> Withdraw 2024-10-15 @ $12.09
+       Volume: 50000 units | Duration: 122 days | Profit: $-8,983.47
+
+Trade: Inject 2024-11-15 @ $12.50 -> Withdraw 2025-01-15 @ $13.10
+       Volume: 50000 units | Duration: 61 days | Profit: $14,737.14
+
+Total Contract Value: $5,753.67
+```
+- Assume a user is considering buying 50,000 units on 15th June 2024 and selling on 15th October 2024, and buying 50,000 units on 15th November 2024 and selling on 15th January 2025.
+- The model predicts gas prices at future dates, calculates trading income, subtracts the cost of storage and gives a profit/loss prediction for each trade.
+- This would help a user predict profitable trades.
+  
+### Historical Prices
+![historical plot](price-plot.png)
+### Seasonal Forecast
+![forecast](seasonal-plot.png)
 
 ## Methodology
 
@@ -45,7 +60,7 @@ The valuation engine calculates the net profit of a storage contract. Unlike sim
 * `pandas` (Data handling)
 * `numpy` (Mathematical operations)
 * `scikit-learn` (Linear Regression)
-* `matplotlib` (Visualization)
+* `matplotlib` (Visualisation)
 
 ## Usage Example
 
