@@ -138,22 +138,22 @@ def calculate_contract_value(injection_dates, withdrawal_dates,
         profit = revenue - cost
         total_value += profit
         
-        print(f"Trade: Inj {inj_date.date()} @ ${buy_price:.2f} -> With {with_date.date()} @ ${sell_price:.2f}")
+        print(f"Trade: Inject {inj_date.date()} @ ${buy_price:.2f} -> Withdraw {with_date.date()} @ ${sell_price:.2f}")
         print(f"       Volume: {volume} units | Duration: {storage_days} days | Profit: ${profit:,.2f}")
 
     return total_value
 
 # --- Example Usage ---
 
-injection_dates = [pd.Timestamp('2023-06-15'), pd.Timestamp('2023-08-15')]
-withdrawal_dates = [pd.Timestamp('2023-12-15'), pd.Timestamp('2024-02-15')]
+injection_dates = [pd.Timestamp('2024-06-15'), pd.Timestamp('2024-11-15')]
+withdrawal_dates = [pd.Timestamp('2024-10-15'), pd.Timestamp('2025-01-15')]
 
 # Rates define how fast we can move gas. 
 # We cannot move 1,000,000 units in one day if the rate is 50,000.
 injection_rate = 50000 
-withdrawal_rate = 70000
+withdrawal_rate = 50000
 max_storage_volume = 1000000
-storage_cost_per_day = 0.01 # Lowered slightly for a realistic example
+storage_cost_per_day = 0.005
 
 contract_val = calculate_contract_value(
     injection_dates, withdrawal_dates,
