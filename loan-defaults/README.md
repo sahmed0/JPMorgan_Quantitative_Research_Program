@@ -26,11 +26,22 @@ This curve shows the **Receiver Operating Characteristic ** curve, which illustr
 ![ROC Curve](ROC.png)
 
 ### Results
+```text
+Cross-Validation AUC: 0.784 (+/- 0.021)
+
+Total Portfolio Expected Loss: $16,507,765.57
+
+--- Feature Importance (Debugging) ---
+                    Feature    Weight  Abs_Weight
+0  credit_lines_outstanding  6.564432    6.564432
+1            debt_to_income  3.345198    3.345198
+3            years_employed -2.238539    2.238539
+4                fico_score -0.923993    0.923993
+2         payment_to_income  0.087355    0.087355
+```
 - AUC represents the model's accuracy (it correctly predicts 78% of test cases). This level of accuracy is in line with good models in real-world financial usage.
-- The Feature Importance scores illustrate how much a given dataset contributes to the model's training. This was used to decide which features to omit from the training to create a realistic model, since the initial model had an accuracy of 100% due to the unrealistic nature of the loan data.
-- Total Portfolio Expected Loss estimates how much money is at risk of being lost by the bank.
-  
-![results](loan-results.png)
+- Total Portfolio Expected Loss estimates that **the bank is at risk of losing approximately £16.5 million**
+- The Feature Importance scores illustrate how much a given dataset contributes to the model's training. This was used to decide which features to omit from the training to create a realistic model, since the initial model had an accuracy of 100% due to the synthetic loan data.
 
 ### Usage
 
@@ -73,12 +84,22 @@ It uses **Maximum Likelihood Estimation (MLE)** to find the optimal cut-off poin
 
 * **Vectorised Lookups:** Instead of iterating through thousands of rows, the script builds a **Cumulative Sum (Prefix Sum) Table**. This allows it to calculate the default rate for any FICO range in  time, speeding up optimisation by orders of magnitude.
 * **Derivative-Free Optimisation:** Uses the **Powell** method instead of gradient-based methods (L-BFGS-B). This is crucial because FICO scores are integers (discrete), meaning the "slope" of the function is often zero or undefined.
-* **Log-Likelihood Calculation:** Optimises boundaries by minimising the Negative Log-Likelihood:
-
+* **Log-Likelihood Calculation:** Optimises boundaries by minimising the Negative Log-Likelihood
+* **Negative Log-Likelihood = - Log-Likelihood**: we use NLL because SciPy only has minimisation functions, minimising NLL is the same as maximising Log-Likelihood
 
 ![equation](log-equation.png)
 
 *Where k is defaults in the bucket, n is total loans, and p is the probability.*
+
+### Results
+```text
+Optimal FICO Thresholds:
+[350, 520, 576, 687, 795]
+```
+- These results suggest splitting borrowers into 5 risk buckets.
+  - With the 300 - 350 bucket being very high risk
+  - And the 795 - 850 being very low risk.
+- These cut-off points are optimal because they maximise the Log-Likelihood. All other possible cutoff points are suboptimal.
 
 ### Usage
 
