@@ -30,13 +30,13 @@ A dual-module project for estimating credit risk and optimising borrower segment
 * *Optimisation:* Uses the **Powell** method (derivative-free) and vectorised cumulative sums for high-performance processing.
 
 
-* **Key Skills:** Logistic Regression, MLE, Feature Engineering, ROC/AUC analysis, Scipy (Optimization), Scikit-learn.
+* **Key Skills:** Logistic Regression, MLE, Feature Engineering, ROC/AUC analysis, Scipy (Optimisation), Scikit-learn.
 
 ## Tools & Libraries Used
 
 * **Core:** Python 3.8+
 * **Data Manipulation:** `pandas`, `numpy`
-* **Modelling:** `scikit-learn` (Logistic & Linear Regression), `scipy` (Optimize)
+* **Modelling:** `scikit-learn` (Logistic & Linear Regression), `scipy` (Optimise)
 * **Visualisation:** `matplotlib`, `seaborn`
 
 ## Installation
@@ -47,3 +47,11 @@ To run these projects, ensure the required packages are installed:
 pip install pandas numpy scikit-learn scipy matplotlib seaborn
 
 ```
+
+## 📄 License
+Copyright © 2026 Sajid Ahmed. All Rights Reserved.
+
+This repository is intended solely for portfolio review and recruitment purposes. By accessing this repository, you acknowledge the following terms:
+View Only: Permission is granted to view the source code for the purpose of evaluating my professional skills and experience.
+No Unauthorised Use: No permission is granted to copy, modify, distribute, or use this code for any personal, commercial, or educational project.
+No AI Training: Use of this source code for the purpose of training machine learning models or generative AI is strictly prohibited.
