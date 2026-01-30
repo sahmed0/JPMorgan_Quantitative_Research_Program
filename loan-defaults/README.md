@@ -133,3 +133,11 @@ Install dependencies via:
 pip install pandas numpy scikit-learn scipy matplotlib seaborn
 
 ```
+
+## 📄 License
+Copyright © 2026 Sajid Ahmed. All Rights Reserved.
+
+This repository is intended solely for portfolio review and recruitment purposes. By accessing this repository, you acknowledge the following terms:
+- View Only: Permission is granted to view the source code for the purpose of evaluating my professional skills and experience.
+- No Unauthorised Use: No permission is granted to copy, modify, distribute, or use this code for any personal, commercial, or educational project.
+- No AI Training: Use of this source code for the purpose of training machine learning models or generative AI is strictly prohibited.
