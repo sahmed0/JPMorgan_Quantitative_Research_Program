@@ -48,10 +48,10 @@ pip install pandas numpy scikit-learn scipy matplotlib seaborn
 
 ```
 
-## 📄 License
-Copyright © 2026 Sajid Ahmed. All Rights Reserved.
+## MIT Licence
 
-This repository is intended solely for portfolio review and recruitment purposes. By accessing this repository, you acknowledge the following terms:
-- View Only: Permission is granted to view the source code for the purpose of evaluating my professional skills and experience.
-- No Unauthorised Use: No permission is granted to copy, modify, distribute, or use this code for any personal, commercial, or educational project.
-- No AI Training: Use of this source code for the purpose of training machine learning models or generative AI is strictly prohibited.
+This project is licensed under the **MIT Licence**. 
+
+This means you are free to use, copy, modify, and distribute the software for any purpose, including commercial applications, provided that the original copyright notice and this permission notice are included in all copies or substantial portions of the software.
+
+*See the [LICENSE](LICENSE) file for the full text.*
