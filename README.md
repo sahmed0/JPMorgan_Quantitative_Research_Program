@@ -1,5 +1,7 @@
 # J.P. Morgan Quant Research Program
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
 This repository contains my solutions for the quantitative research tasks focused on predictive modelling and risk assessment. The projects demonstrate the application of machine learning and statistical optimisation to solve pricing and credit risk problems.
 
 ## Projects
@@ -48,10 +50,13 @@ pip install pandas numpy scikit-learn scipy matplotlib seaborn
 
 ```
 
-## MIT Licence
+## License
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-This project is licensed under the **MIT Licence**. 
+Copyright © 2026 Sajid Ahmed
 
-This means you are free to use, copy, modify, and distribute the software for any purpose, including commercial applications, provided that the original copyright notice and this permission notice are included in all copies or substantial portions of the software.
+This program is free software: you can redistribute it and/or modify it under the terms of the **GNU General Public License** as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-*See the [LICENSE](LICENSE) file for the full text.*
+This program is distributed in the hope that it will be useful, but **WITHOUT ANY WARRANTY**; without even the implied warranty of **MERCHANTABILITY** or **FITNESS FOR A PARTICULAR PURPOSE**. 
+
+See the [LICENSE](LICENSE) file for more details.
